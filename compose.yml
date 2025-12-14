@@ -1,0 +1,17 @@
+services:
+  
+  api-gateway:
+    image: nginx:1.25-alpine
+    container_name: api-gateway
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/logs:/var/log/nginx
+    networks:
+      - corebank-net
+
+networks:
+  corebank-net:
+    driver: bridge
