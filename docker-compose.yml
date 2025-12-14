@@ -1,0 +1,43 @@
+services:
+  
+  api-gateway:
+    image: openresty/openresty:alpine
+    container_name: api-gateway
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/usr/local/openresty/nginx/conf/nginx.conf:ro
+      - ./nginx/logs:/usr/local/openresty/nginx/logs
+      - ./nginx/certs:/etc/nginx/certs:ro
+    networks:
+      - corebank-net
+
+  authentication-db:
+    image: postgresql:15-alpine
+    container_name: authentication-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${AUTH_USER}
+      POSTGRES_PASSWORD: ${AUTH_PASS}
+      POSTGRES_DB: ${AUTH_DB}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./authenticationservice/auth_db:/var/lib/postgresql/data
+    networks:
+      - corebank-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${AUTH_USER} -d $${AUTH_DB}"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+      start_period: 10s
+
+volumes:
+  auth_db:
+    driver: local
+
+networks:
+  corebank-net:
+    driver: bridge
