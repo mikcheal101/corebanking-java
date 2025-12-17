@@ -1,7 +1,6 @@
 package com.mikky.corebanking.authenticationservice.domain.model;
 
 import java.util.UUID;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -29,6 +28,6 @@ public class Role {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = false)
     private RoleType roleType;
 }

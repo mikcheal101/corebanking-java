@@ -4,10 +4,10 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
-import com.mikky.corebanking.authenticationservice.messaging.publisher.ForgotPasswordChangeEventPublisher;
-import com.mikky.corebanking.authenticationservice.messaging.publisher.ForgotPasswordEventPublisher;
-import com.mikky.corebanking.authenticationservice.messaging.publisher.UserCreatedEventPublisher;
-import com.mikky.corebanking.authenticationservice.messaging.publisher.UserSignedInEventPublisher;
+import com.mikky.corebanking.authenticationservice.infrastructure.messaging.publisher.ForgotPasswordChangeEventPublisher;
+import com.mikky.corebanking.authenticationservice.infrastructure.messaging.publisher.ForgotPasswordEventPublisher;
+import com.mikky.corebanking.authenticationservice.infrastructure.messaging.publisher.UserCreatedEventPublisher;
+import com.mikky.corebanking.authenticationservice.infrastructure.messaging.publisher.UserSignedInEventPublisher;
 
 @TestConfiguration
 public class TestConfig {

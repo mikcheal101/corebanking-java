@@ -5,7 +5,9 @@ import java.util.stream.Collectors;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import com.mikky.corebanking.authenticationservice.security.JwtProperties;
+
+import com.mikky.corebanking.authenticationservice.infrastructure.security.JwtProperties;
+
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;

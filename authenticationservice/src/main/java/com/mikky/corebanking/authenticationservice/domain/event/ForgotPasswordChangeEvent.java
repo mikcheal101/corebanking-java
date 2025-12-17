@@ -2,8 +2,6 @@ package com.mikky.corebanking.authenticationservice.domain.event;
 
 import java.time.Instant;
 import java.util.Set;
-
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,8 +12,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ForgotPasswordChangeEvent implements Event {
-    private EventType eventType;
-    private Instant occuredAt = Instant.now();
+    
+    @Builder.Default
+    private EventType eventType = EventType.FORGOT_PASSWORD_CHANGED;
+    
+    @Builder.Default
+    private Instant occurredAt = Instant.now();
+    
     private int version;
     private Payload payload;
 
