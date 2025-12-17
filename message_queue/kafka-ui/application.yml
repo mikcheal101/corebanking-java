@@ -1,0 +1,8 @@
+akhq:
+    connections:
+        local:
+            properties:
+                bootstrap.servers: message_queue:9092
+            schema-registry: http://schema-registry:8081
+            security:
+                protocol: PLAINTEXT
