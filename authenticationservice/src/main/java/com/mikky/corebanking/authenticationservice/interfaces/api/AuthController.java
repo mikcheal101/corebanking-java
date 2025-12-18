@@ -80,7 +80,7 @@ public class AuthController {
                     .body(new SigninResponse("successfully logged in", token));
         } catch (Exception exception) {
             return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
+                    .status(HttpStatus.FORBIDDEN)
                     .body(new SigninResponse(exception.getMessage(), null));
         }
     }

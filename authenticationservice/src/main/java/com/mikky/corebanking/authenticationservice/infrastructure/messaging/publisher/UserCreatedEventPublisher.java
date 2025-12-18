@@ -2,7 +2,7 @@ package com.mikky.corebanking.authenticationservice.infrastructure.messaging.pub
 
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
-import com.mikky.corebanking.authenticationservice.domain.event.UserCreatedEvent;
+import com.mikky.corebanking.events.auth.UserCreatedEvent;
 
 @Component
 public class UserCreatedEventPublisher extends KafkaEventPublisher<UserCreatedEvent> {

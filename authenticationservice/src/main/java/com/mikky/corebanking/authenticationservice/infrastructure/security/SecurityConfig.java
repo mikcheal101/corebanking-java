@@ -1,8 +1,5 @@
 package com.mikky.corebanking.authenticationservice.infrastructure.security;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,9 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
-
 import com.mikky.corebanking.authenticationservice.shared.util.JwtUtils;
-
 import lombok.RequiredArgsConstructor;
 
 @EnableWebSecurity

@@ -11,4 +11,5 @@ import com.mikky.corebanking.authenticationservice.domain.model.RoleType;
 public interface RoleQueryRepository extends JpaRepository<Role, UUID> {
     Optional<Role> findByRoleType(RoleType roleType);
     Optional<Role> findByNameAndRoleType(String name, RoleType roleType);
+    boolean existsByNameAndRoleType(String name, RoleType roleType);
 }

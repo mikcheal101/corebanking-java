@@ -6,33 +6,33 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class AuthCommandServiceTest {
 
-    @Test
-    void shouldRegisterNewUserSuccessfully() {
+    // @Test
+    // void shouldRegisterNewUserSuccessfully() {
 
-    }
-    @Test
-    void shouldFailIfUsernameExists() {
+    // }
+    // @Test
+    // void shouldFailIfUsernameExists() {
 
-    }
-    @Test
-    void shouldFailWithInvalidPasswordInput() {
+    // }
+    // @Test
+    // void shouldFailWithInvalidPasswordInput() {
 
-    }
-    @Test
-    void shouldFailWithNoPasswordInput() {
+    // }
+    // @Test
+    // void shouldFailWithNoPasswordInput() {
 
-    }
-    @Test
-    void shouldFailWithNoUsernameInput() {
+    // }
+    // @Test
+    // void shouldFailWithNoUsernameInput() {
 
-    }
-    @Test
-    void shouldRejectTooShortPassword() {
+    // }
+    // @Test
+    // void shouldRejectTooShortPassword() {
 
-    }
-    @Test
-    void shouldRejectPasswordWithoutUppercase() {
+    // }
+    // @Test
+    // void shouldRejectPasswordWithoutUppercase() {
 
-    }
+    // }
     
 }

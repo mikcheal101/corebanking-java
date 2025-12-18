@@ -3,10 +3,9 @@ package com.mikky.corebanking.authenticationservice.infrastructure.messaging.pub
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
-import com.mikky.corebanking.authenticationservice.domain.event.Event;
 import com.mikky.corebanking.authenticationservice.domain.exceptions.KafkaUnInitializedException;
+import com.mikky.corebanking.events.base.Event;
 import lombok.Setter;
-
 
 @Setter
 public abstract class KafkaEventPublisher<T extends Event> implements DomainEventPublisher<T> {

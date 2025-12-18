@@ -2,7 +2,7 @@ package com.mikky.corebanking.authenticationservice.infrastructure.messaging.pub
 
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
-import com.mikky.corebanking.authenticationservice.domain.event.ForgotPasswordEvent;
+import com.mikky.corebanking.events.auth.ForgotPasswordEvent;
 
 @Component
 public class ForgotPasswordEventPublisher extends KafkaEventPublisher<ForgotPasswordEvent> {

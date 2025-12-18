@@ -11,12 +11,6 @@ import com.mikky.corebanking.authenticationservice.application.command.dto.Forgo
 import com.mikky.corebanking.authenticationservice.application.command.dto.ForgotPasswordRequest;
 import com.mikky.corebanking.authenticationservice.application.command.dto.SigninRequest;
 import com.mikky.corebanking.authenticationservice.application.command.dto.SignupRequest;
-import com.mikky.corebanking.authenticationservice.domain.event.Channel;
-import com.mikky.corebanking.authenticationservice.domain.event.EventType;
-import com.mikky.corebanking.authenticationservice.domain.event.ForgotPasswordChangeEvent;
-import com.mikky.corebanking.authenticationservice.domain.event.ForgotPasswordEvent;
-import com.mikky.corebanking.authenticationservice.domain.event.UserCreatedEvent;
-import com.mikky.corebanking.authenticationservice.domain.event.UserSignedInEvent;
 import com.mikky.corebanking.authenticationservice.domain.exceptions.PasswordTokenExpiredException;
 import com.mikky.corebanking.authenticationservice.domain.exceptions.PasswordTokenInvalidException;
 import com.mikky.corebanking.authenticationservice.domain.exceptions.PasswordTokenNotFoundException;
@@ -35,6 +29,13 @@ import com.mikky.corebanking.authenticationservice.infrastructure.persistence.co
 import com.mikky.corebanking.authenticationservice.infrastructure.persistence.query.PasswordResetTokenQueryRepository;
 import com.mikky.corebanking.authenticationservice.infrastructure.persistence.query.RoleQueryRepository;
 import com.mikky.corebanking.authenticationservice.infrastructure.persistence.query.UserQueryRepository;
+import com.mikky.corebanking.events.auth.ForgotPasswordChangeEvent;
+import com.mikky.corebanking.events.auth.ForgotPasswordEvent;
+import com.mikky.corebanking.events.auth.UserCreatedEvent;
+import com.mikky.corebanking.events.auth.UserSignedInEvent;
+import com.mikky.corebanking.events.base.EventType;
+import com.mikky.corebanking.events.notification.Channel;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 

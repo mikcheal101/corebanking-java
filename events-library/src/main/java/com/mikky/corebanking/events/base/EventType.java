@@ -1,4 +1,4 @@
-package com.mikky.corebanking.authenticationservice.domain.event;
+package com.mikky.corebanking.events.base;
 
 import lombok.Getter;
 

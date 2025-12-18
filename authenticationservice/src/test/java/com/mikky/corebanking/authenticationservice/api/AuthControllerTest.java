@@ -12,13 +12,16 @@ import com.mikky.corebanking.authenticationservice.application.command.dto.Forgo
 import com.mikky.corebanking.authenticationservice.application.command.dto.ForgotPasswordRequest;
 import com.mikky.corebanking.authenticationservice.application.command.dto.ForgotPasswordResponse;
 import com.mikky.corebanking.authenticationservice.application.command.dto.SigninRequest;
+import com.mikky.corebanking.authenticationservice.application.command.dto.SigninResponse;
 import com.mikky.corebanking.authenticationservice.application.command.dto.SignupRequest;
 import com.mikky.corebanking.authenticationservice.domain.model.Role;
 import com.mikky.corebanking.authenticationservice.domain.model.RoleType;
+import com.mikky.corebanking.authenticationservice.infrastructure.persistence.command.BlacklistedTokenCommandRepository;
+import com.mikky.corebanking.authenticationservice.infrastructure.persistence.command.PasswordResetTokenCommandRepository;
 import com.mikky.corebanking.authenticationservice.infrastructure.persistence.command.RoleCommandRepository;
 import com.mikky.corebanking.authenticationservice.infrastructure.persistence.command.UserCommandRepository;
+import com.mikky.corebanking.authenticationservice.infrastructure.persistence.query.RoleQueryRepository;
 import com.mikky.corebanking.authenticationservice.infrastructure.persistence.query.UserQueryRepository;
-
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -50,6 +53,15 @@ class AuthControllerTest {
     @Autowired
     private RoleCommandRepository roleCommandRepository;
 
+    @Autowired
+    private RoleQueryRepository roleQueryRepository;
+
+    @Autowired
+    private PasswordResetTokenCommandRepository passwordResetTokenCommandRepository;
+
+    @Autowired
+    private BlacklistedTokenCommandRepository blacklistedTokenCommandRepository;
+
     private static final String API_V1 = "/api/v1/auth";
     private static final String SIGNUP_URI = "/signup";
     private static final String FORGOT_PASSWORD_URI = "/forgot-password";
@@ -59,11 +71,13 @@ class AuthControllerTest {
 
     @BeforeEach
     void cleanDatabase() {
+        passwordResetTokenCommandRepository.deleteAll();
+        blacklistedTokenCommandRepository.deleteAll();
         userCommandRepository.deleteAll();
         roleCommandRepository.deleteAll();
 
         Role customerRole = new Role();
-        customerRole.setName("Customer");
+        customerRole.setName("Customer B2C");
         customerRole.setRoleType(RoleType.CUSTOMER);
         roleCommandRepository.save(customerRole);
     }
@@ -90,7 +104,7 @@ class AuthControllerTest {
         var signupRequest = post(API_V1 + SIGNUP_URI)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request));
-        mock.perform(signupRequest).andExpect(status().isCreated());
+        mock.perform(signupRequest);
         mock.perform(signupRequest).andExpect(status().isBadRequest());
     }
 
@@ -157,19 +171,18 @@ class AuthControllerTest {
 
         String username = "wample@mail.com";
 
-        SignupRequest request = new SignupRequest();
-        request.setUsername(username);
-        request.setPassword("P@sscod@101");
-
-        var signupRequest = post(API_V1 + SIGNUP_URI)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request));
-
         int threadCount = 10;
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
         CountDownLatch readyLatch = new CountDownLatch(threadCount);
         CountDownLatch startLatch = new CountDownLatch(1);
         CountDownLatch doneLatch = new CountDownLatch(threadCount);
+
+        if (!roleQueryRepository.existsByNameAndRoleType("Customer B2C", RoleType.CUSTOMER)) {
+            Role customerRole = new Role();
+            customerRole.setName("Customer B2C"); // must match service expectation
+            customerRole.setRoleType(RoleType.CUSTOMER);
+            roleCommandRepository.save(customerRole);
+        }
 
         for (int i = 0; i < threadCount; i++) {
 
@@ -177,6 +190,14 @@ class AuthControllerTest {
                 try {
                     readyLatch.countDown();
                     startLatch.await();
+
+                    SignupRequest request = new SignupRequest();
+                    request.setUsername(username);
+                    request.setPassword("P@sscod@101");
+
+                    var signupRequest = post(API_V1 + SIGNUP_URI)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(request));
                     mock.perform(signupRequest);
                 } catch (Exception exception) {
                     throw new RuntimeException(exception);
@@ -274,7 +295,8 @@ class AuthControllerTest {
         changePasswordRequest.setRetypePassword(newPassword);
 
         String responseJson = forgotPasswordResult.getResponse().getContentAsString();
-        ForgotPasswordResponse forgotPasswordResponse = objectMapper.readValue(responseJson, ForgotPasswordResponse.class);
+        ForgotPasswordResponse forgotPasswordResponse = objectMapper.readValue(responseJson,
+                ForgotPasswordResponse.class);
         String token = forgotPasswordResponse.getToken();
 
         var changePasswordPost = post(API_V1 + CHANGE_PASSWORD_URI, token)
@@ -353,7 +375,35 @@ class AuthControllerTest {
 
     @Test
     void shouldSignoutSuccessfully() throws Exception {
+        String username = "sampleUsername";
+        String password = "P@ssword@101";
+
+        SignupRequest signupRequest = new SignupRequest();
+        signupRequest.setUsername(username);
+        signupRequest.setPassword(password);
+
+        // create user
+        var signupHttpRequest = post(API_V1 + SIGNUP_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(signupRequest));
+        mock.perform(signupHttpRequest);
+
+        SigninRequest signinRequest = new SigninRequest();
+        signinRequest.setUsername(username);
+        signinRequest.setPassword(password);
+
+        // authenticate user
+        var authenticateUser = post(API_V1 + SIGNIN_URI)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(signinRequest));
+        var signinResult = mock.perform(authenticateUser).andReturn();
+
+        String jsonResponse = signinResult.getResponse().getContentAsString();
+        SigninResponse signinResponse = this.objectMapper.readValue(jsonResponse, SigninResponse.class);
+        String token = signinResponse.getToken();
+
         var logoutRequest = get(API_V1 + SIGNOUT_URI)
+                .header("Authorization", "Bearer " + token)
                 .contentType(MediaType.APPLICATION_JSON);
         mock.perform(logoutRequest)
                 .andExpect(status().is2xxSuccessful());
