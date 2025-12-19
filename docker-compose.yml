@@ -14,6 +14,8 @@ services:
       - corebank-net
     depends_on:
       - authentication
+      - notification
+      - message_queue
 
   message_queue:
     image: apache/kafka:latest
@@ -36,8 +38,19 @@ services:
       KAFKA_MESSAGE_MAX_BYTES: ${KAFKA_MESSAGE_MAX_BYTES}          # 2 GB max message size
       KAFKA_REPLICA_FETCH_MAX_BYTES: ${KAFKA_REPLICA_FETCH_MAX_BYTES}    # allow replicas to fetch larger messages
       KAFKA_FETCH_MAX_BYTES: ${KAFKA_FETCH_MAX_BYTES}            # client fetch size
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      # Add authentication if needed
+      KAFKA_SASL_ENABLED_MECHANISMS: PLAIN
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: PLAIN
     networks:
       - corebank-net
+    volumes:
+      - ./message_queue/kafka:/tmp/kafka-logs
+    healthcheck:
+      test: ["CMD", "kafka-topics", "--list", "--bootstrap-server", "localhost:9092"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   kafka-ui:
     image: obsidiandynamics/kafdrop
@@ -62,7 +75,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - ./authenticationservice/auth_db:/var/lib/postgresql/data
+      - ./database/auth_db:/var/lib/postgresql/data
     networks:
       - corebank-net
     healthcheck:
@@ -79,7 +92,15 @@ services:
     container_name: authentication-service
     restart: unless-stopped
     environment:
+      SPRING_APPLICATION_NAME: authentication
       SPRING_KAFKA_BOOTSTRAP_SERVERS: message_queue:9092
+      SPRING_KAFKA_PRODUCER_KEY_SERIALIZER: org.apache.kafka.common.serialization.StringSerializer
+      SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER: org.springframework.kafka.support.serializer.JsonSerializer
+      SPRING_KAFKA_CONSUMER_KEY_DESERIALIZER: org.apache.kafka.common.serialization.StringDeserializer
+      SPRING_KAFKA_CONSUMER_VALUE_DESERIALIZER: org.springframework.kafka.support.serializer.JsonDeserializer
+      SPRING_KAFKA_CONSUMER_GROUP_ID: ${SPRING_KAFKA_CONSUMER_GROUP_ID}
+      SPRING_KAFKA_PRODUCER_ACKS: all
+      SPRING_KAFKA_PRODUCER_RETRIES: 3
       SPRING_DATASOURCE_URL: jdbc:postgresql://authentication-db:${AUTH_DB_PORT}/${AUTH_DB}
       SPRING_DATASOURCE_USERNAME: ${AUTH_USER}
       SPRING_DATASOURCE_PASSWORD: ${AUTH_PASS}
@@ -103,7 +124,36 @@ services:
     networks:
       - corebank-net
 
+  notification:
+    build: 
+      context: .
+      dockerfile: notification/Dockerfile
+    container_name: notification-service
+    restart: unless-stopped
+    environment:
+      SPRING_APPLICATION_NAME: notification
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: message_queue:9092
+      SPRING_KAFKA_PRODUCER_KEY_SERIALIZER: org.apache.kafka.common.serialization.StringSerializer
+      SPRING_KAFKA_PRODUCER_VALUE_SERIALIZER: org.springframework.kafka.support.serializer.JsonSerializer
+      SPRING_KAFKA_CONSUMER_KEY_DESERIALIZER: org.apache.kafka.common.serialization.StringDeserializer
+      SPRING_KAFKA_CONSUMER_VALUE_DESERIALIZER: org.springframework.kafka.support.serializer.JsonDeserializer
+      SPRING_KAFKA_CONSUMER_GROUP_ID: ${SPRING_KAFKA_CONSUMER_GROUP_ID}
+      SPRING_KAFKA_PRODUCER_ACKS: all
+      SPRING_KAFKA_PRODUCER_RETRIES: 3
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS}
+      SECURITY_ENDPOINTS: ${PUBLIC_ENDPOINTS}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
+      CORS_ALLOWED_HEADERS: ${CORS_ALLOWED_HEADERS}
+      CORS_ALLOWED_METHODS: ${CORS_ALLOWED_METHODS}
+      CORS_ALLOWED_CREDENTIALS: ${CORS_ALLOWED_CREDENTIALS}
+    ports:
+      - 8082:8080
+    networks:
+      - corebank-net
+
 volumes:
+  kafka:
   auth_db:
     driver: local
 

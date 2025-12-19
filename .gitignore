@@ -2,3 +2,6 @@
 
 nginx/logs/*
 # nginx/certs/* temporarily allow the current certificate
+
+message_queue
+database
