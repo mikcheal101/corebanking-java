@@ -1,4 +1,4 @@
-package com.mikky.corebanking.events.notification;
+package com.mikky.corebanking.events.domain.event.notification;
 
 public enum Channel {
     WHATSAPP,

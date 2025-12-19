@@ -1,11 +1,11 @@
-package com.mikky.corebanking.events.auth;
+package com.mikky.corebanking.events.domain.event.notification;
 
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.Set;
-import com.mikky.corebanking.events.base.Event;
-import com.mikky.corebanking.events.base.EventType;
-import com.mikky.corebanking.events.notification.Channel;
+
+import com.mikky.corebanking.events.domain.event.Event;
+import com.mikky.corebanking.events.domain.event.EventType;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,16 +15,16 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserSignedInEvent implements Event, Serializable {
-    
+public class NotificationSentEvent implements Event, Serializable {
+
     @Builder.Default
-    private EventType eventType = EventType.USER_LOGGED_IN;
-    
-    @Builder.Default
-    private int version = 1;
+    private EventType eventType = EventType.NOTIFICATION_SENT;
 
     @Builder.Default
     private Instant occurredAt = Instant.now();
+
+    @Builder.Default
+    private int version = 1;
 
     private Payload payload;
 
@@ -34,8 +34,9 @@ public class UserSignedInEvent implements Event, Serializable {
     @AllArgsConstructor
     public static class Payload implements Serializable {
         private String username;
-        private int expiry;
-        private Set<Channel> channels;
+        private Channel channel;
+        private String message;
+        private boolean success;
     }
 
     @Override

@@ -1,11 +1,13 @@
-package com.mikky.corebanking.events.auth;
+package com.mikky.corebanking.events.domain.event.auth;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Set;
-import com.mikky.corebanking.events.base.Event;
-import com.mikky.corebanking.events.base.EventType;
-import com.mikky.corebanking.events.notification.Channel;
+
+import com.mikky.corebanking.events.domain.event.Event;
+import com.mikky.corebanking.events.domain.event.EventType;
+import com.mikky.corebanking.events.domain.event.notification.Channel;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,17 +17,17 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ForgotPasswordEvent implements Event, Serializable {
-
+public class ForgotPasswordChangeEvent implements Event, Serializable {
+    
     @Builder.Default
-    private EventType eventType = EventType.FORGOT_PASSWORD;
+    private EventType eventType = EventType.FORGOT_PASSWORD_CHANGED;
+    
+    @Builder.Default
+    private Instant occurredAt = Instant.now();
     
     @Builder.Default
     private int version = 1;
     
-    @Builder.Default
-    private Instant occurredAt = Instant.now();
-
     private Payload payload;
 
     @Data
@@ -34,12 +36,8 @@ public class ForgotPasswordEvent implements Event, Serializable {
     @AllArgsConstructor
     public static class Payload implements Serializable {
         private String username;
-        private String resetToken;
-        private int expiry;
         private Set<Channel> channels;
-
-        @Builder.Default
-        private Instant changedAt = Instant.now();
+        private int expiry;
     }
 
     @Override

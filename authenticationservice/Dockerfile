@@ -10,7 +10,7 @@ RUN mvn clean install -B
 # Copy authenticationservice and build
 WORKDIR /app/authenticationservice
 COPY authenticationservice/pom.xml .
-RUN mvn dependency:go-offline -B
+
 COPY authenticationservice/src ./src
 RUN mvn clean install -B -DskipTests
 

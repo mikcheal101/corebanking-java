@@ -1,4 +1,4 @@
-package com.mikky.corebanking.authenticationservice.domain.exceptions;
+package com.mikky.corebanking.events.domain.exceptions;
 
 public abstract class CustomException extends RuntimeException {
 
