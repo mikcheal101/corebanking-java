@@ -19,13 +19,13 @@ import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
-public abstract class KafkaEventConsumer {
+public class KafkaEventConsumer {
 
     protected Logger log = LoggerFactory.getLogger(getClass());
     private final ConsumerFactory<String, String> consumerFactory;
     private final List<DomainEventConsumer<?>> consumers;
     private final ObjectMapper objectMapper;
-    private final ConcurrentHashMap<String, ConcurrentMessageListenerContainer<String, String>> containers;
+    private ConcurrentHashMap<String, ConcurrentMessageListenerContainer<String, String>> containers = new ConcurrentHashMap<>();
 
     @PostConstruct
     public void init() {
@@ -37,16 +37,17 @@ public abstract class KafkaEventConsumer {
     private <T extends Event> void startConsumer(DomainEventConsumer<T> consumer) {
         String topic = consumer.getTopic();
         var containerProperties = new ContainerProperties(topic);
-        containerProperties.setMessageListener((MessageListener<String, String>) messageListener -> {
+        containerProperties.setMessageListener((MessageListener<String, T>) messageListener -> {
             try {
-                T event = objectMapper.readValue(messageListener.value(), consumer.getEventClass());
-                consumer.consume(event);
-                log.info("Successfully processed event from topic {}: {}", topic, event);
+                // T event = objectMapper.readValue(messageListener.value(), consumer.getEventClass());
+                consumer.consume(messageListener.value());
+
+                log.info("Successfully processed event from topic {}: {}", topic, messageListener.value());
             } catch (Exception e) {
                 log.error(e.getMessage());
             }
         });
-        containerProperties.setAckMode(ContainerProperties.AckMode.MANUAL_IMMEDIATE);
+        containerProperties.setAckMode(ContainerProperties.AckMode.RECORD);
 
         var container = new ConcurrentMessageListenerContainer<>(consumerFactory, containerProperties);
         container.setConcurrency(1);

@@ -2,10 +2,12 @@ package com.mikky.corebanking.notification.infrastructure.messaging.consumer.aut
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import com.mikky.corebanking.events.infrastructure.messaging.consumer.DomainEventConsumer;
 import com.mikky.corebanking.events.domain.event.EventType;
 import com.mikky.corebanking.events.domain.event.auth.UserSignedInEvent;
 
+@Component
 public class UserSignedInEventConsumer implements DomainEventConsumer<UserSignedInEvent> {
 
     Logger log = LoggerFactory.getLogger(getClass());
