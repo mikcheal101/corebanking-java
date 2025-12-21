@@ -15,7 +15,6 @@ import com.mikky.corebanking.authenticationservice.application.command.dto.Signi
 import com.mikky.corebanking.authenticationservice.application.command.dto.SigninResponse;
 import com.mikky.corebanking.authenticationservice.application.command.dto.SignupRequest;
 import com.mikky.corebanking.authenticationservice.domain.model.Role;
-import com.mikky.corebanking.authenticationservice.domain.model.RoleType;
 import com.mikky.corebanking.authenticationservice.infrastructure.persistence.command.BlacklistedTokenCommandRepository;
 import com.mikky.corebanking.authenticationservice.infrastructure.persistence.command.PasswordResetTokenCommandRepository;
 import com.mikky.corebanking.authenticationservice.infrastructure.persistence.command.RoleCommandRepository;
@@ -76,9 +75,7 @@ class AuthControllerTest {
         userCommandRepository.deleteAll();
         roleCommandRepository.deleteAll();
 
-        Role customerRole = new Role();
-        customerRole.setName("Customer B2C");
-        customerRole.setRoleType(RoleType.CUSTOMER);
+        var customerRole = Role.builder().name("Customer B2C").build();
         roleCommandRepository.save(customerRole);
     }
 
@@ -176,13 +173,6 @@ class AuthControllerTest {
         CountDownLatch readyLatch = new CountDownLatch(threadCount);
         CountDownLatch startLatch = new CountDownLatch(1);
         CountDownLatch doneLatch = new CountDownLatch(threadCount);
-
-        if (!roleQueryRepository.existsByNameAndRoleType("Customer B2C", RoleType.CUSTOMER)) {
-            Role customerRole = new Role();
-            customerRole.setName("Customer B2C"); // must match service expectation
-            customerRole.setRoleType(RoleType.CUSTOMER);
-            roleCommandRepository.save(customerRole);
-        }
 
         for (int i = 0; i < threadCount; i++) {
 

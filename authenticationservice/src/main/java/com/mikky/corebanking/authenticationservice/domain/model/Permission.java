@@ -2,6 +2,7 @@ package com.mikky.corebanking.authenticationservice.domain.model;
 
 import java.time.Instant;
 import java.util.UUID;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,14 +14,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Table(name = "jwt_blacklist")
-@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class BlacklistedToken {
-    
+@Entity
+@Table(name = "permissions")
+public class Permission {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
@@ -32,9 +32,6 @@ public class BlacklistedToken {
     @Column(nullable = true)
     protected Instant updatedAt;
 
-    @Column(nullable = false)
-    private String token;
-
-    @Column(nullable = false)
-    private Instant expiry;
+    @Column(nullable = false, unique = true)
+    private String name;
 }

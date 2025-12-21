@@ -4,11 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-
 import com.mikky.corebanking.authenticationservice.domain.model.Role;
-import com.mikky.corebanking.authenticationservice.domain.model.RoleType;
 import com.mikky.corebanking.authenticationservice.infrastructure.persistence.command.RoleCommandRepository;
-
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -30,12 +27,12 @@ public class DatabaseSeeder implements CommandLineRunner {
             if (count == 0) {
                 logger.info("Seeding roles into the database...");
 
-                seedRole("Customer B2C", RoleType.CUSTOMER);
-                seedRole("Customer B2B", RoleType.CUSTOMER);
-                seedRole("Merchant", RoleType.CUSTOMER);
-                seedRole("Merchant Administrator", RoleType.ADMIN);
-                seedRole("Administrator", RoleType.ADMIN);
-                seedRole("Super Administrator", RoleType.SUPER_ADMIN);
+                seedRole("CUSTOMER_B2C");
+                seedRole("CUSTOMER_B2B");
+                seedRole("MERCHANT");
+                seedRole("MERCHANT_ADMINISTRATOR");
+                seedRole("ADMINISTRATOR");
+                seedRole("SUPER_ADMINISTRATOR");
 
                 logger.info("Seeding roles completed successfully!");
             } else {
@@ -46,11 +43,11 @@ public class DatabaseSeeder implements CommandLineRunner {
         }
     }
 
-    private void seedRole(String name, RoleType roleType) {
-        Role role = new Role();
-        role.setName(name);
-        role.setRoleType(roleType);
+    private void seedRole(String name) {
+        var role = Role.builder()
+            .name(name)
+            .build();
         roleCommandRepository.save(role);
-        logger.info("Seeded role: {} ({})", name, roleType);
+        logger.info("Seeded role: {}", name);
     }
 }

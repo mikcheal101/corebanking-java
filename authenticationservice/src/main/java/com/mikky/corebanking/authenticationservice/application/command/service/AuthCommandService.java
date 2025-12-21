@@ -18,7 +18,6 @@ import com.mikky.corebanking.authenticationservice.domain.exceptions.RoleNotFoun
 import com.mikky.corebanking.authenticationservice.domain.exceptions.UserDoesNotExistException;
 import com.mikky.corebanking.authenticationservice.domain.exceptions.UsernameAlreadyExistsException;
 import com.mikky.corebanking.authenticationservice.domain.model.PasswordResetToken;
-import com.mikky.corebanking.authenticationservice.domain.model.RoleType;
 import com.mikky.corebanking.authenticationservice.domain.model.User;
 import com.mikky.corebanking.authenticationservice.infrastructure.messaging.kafka.publisher.ForgotPasswordChangeEventPublisher;
 import com.mikky.corebanking.authenticationservice.infrastructure.messaging.kafka.publisher.ForgotPasswordEventPublisher;
@@ -35,7 +34,6 @@ import com.mikky.corebanking.events.domain.event.auth.ForgotPasswordEvent;
 import com.mikky.corebanking.events.domain.event.auth.UserCreatedEvent;
 import com.mikky.corebanking.events.domain.event.auth.UserSignedInEvent;
 import com.mikky.corebanking.events.domain.event.notification.Channel;
-
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -70,8 +68,8 @@ public class AuthCommandService {
         var passcode = passwordEncoder.encode(signupRequest.getPassword());
         user.setPassword(passcode);
 
-        var role = roleQueryRepository.findByNameAndRoleType("Customer B2C", RoleType.CUSTOMER)
-                .orElseThrow(() -> new RoleNotFoundException(RoleType.CUSTOMER));
+        var role = roleQueryRepository.findByName("Customer B2C")
+                .orElseThrow(() -> new RoleNotFoundException("Customer B2C"));
         user.setRoles(Set.of(role));
 
         // save user
