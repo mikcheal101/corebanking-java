@@ -67,6 +67,7 @@ services:
     networks:
       - corebank-net
 
+# Databases
   authentication-db:
     image: postgres:15-alpine
     container_name: authentication-db
@@ -76,7 +77,7 @@ services:
       POSTGRES_PASSWORD: ${AUTH_PASS}
       POSTGRES_DB: ${AUTH_DB}
     ports:
-      - 5432:5432
+      - ${POSTGRESQL_DB_PORT}:5432
     volumes:
       - ./database/auth_db:/var/lib/postgresql/data
     networks:
@@ -88,6 +89,28 @@ services:
       timeout: 5s
       start_period: 10s
 
+  notification-db:
+    image: postgres:15-alpine
+    container_name: notification-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${NOTIFICATION_USER}
+      POSTGRES_PASSWORD: ${NOTIFICATION_PASS}
+      POSTGRES_DB: ${NOTIFICATION_DB}
+    ports:
+      - ${POSTGRESQL_DB_PORT}:5432
+    volumes:
+      - ./database/notification_db:/var/lib/postgresql/data
+    networks:
+      - corebank-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${NOTIFICATION_USER} -d $${NOTIFICATION_DB}"]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+      start_period: 10s
+
+  # Services
   authentication:
     build: 
       context: .
@@ -106,7 +129,7 @@ services:
       SPRING_KAFKA_LISTENER_ACK_MODE: ${SPRING_KAFKA_LISTENER_ACK_MODE}
       SPRING_KAFKA_PRODUCER_ACKS: all
       SPRING_KAFKA_PRODUCER_RETRIES: 3
-      SPRING_DATASOURCE_URL: jdbc:postgresql://authentication-db:${AUTH_DB_PORT}/${AUTH_DB}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://authentication-db:${POSTGRESQL_DB_PORT}/${AUTH_DB}
       SPRING_KAFKA_PRODUCER_PROPERTIES_SPRING_JSON_ADD_TYPE_INFO_HEADERS: ${SPRING_JSON_ADD_TYPE_INFO_HEADERS}
       SPRING_DATASOURCE_USERNAME: ${AUTH_USER}
       SPRING_DATASOURCE_PASSWORD: ${AUTH_PASS}
@@ -124,8 +147,8 @@ services:
       CORS_ALLOWED_METHODS: ${CORS_ALLOWED_METHODS}
       CORS_ALLOWED_CREDENTIALS: ${CORS_ALLOWED_CREDENTIALS}
     depends_on: 
-      authentication-db:
-        condition: service_healthy
+      - authentication-db
+      - message_queue
     ports:
       - 8081:8080
     networks:
@@ -151,6 +174,14 @@ services:
       SPRING_KAFKA_PRODUCER_PROPERTIES_SPRING_JSON_ADD_TYPE_INFO_HEADERS: ${SPRING_JSON_ADD_TYPE_INFO_HEADERS}
       SPRING_KAFKA_PRODUCER_ACKS: all
       SPRING_KAFKA_PRODUCER_RETRIES: 3
+      SPRING_DATASOURCE_URL: jdbc:postgresql://notification-db:${POSTGRESQL_DB_PORT}/${NOTIFICATION_DB}
+      SPRING_DATASOURCE_USERNAME: ${NOTIFICATION_USER}
+      SPRING_DATASOURCE_PASSWORD: ${NOTIFICATION_PASS}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_DATASOURCE_DRIVER-CLASS-NAME: org.postgresql.Driver
+      SPRING_JPA_SHOW-SQL: true
+      SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL: true
+      SPRING_JPA_PROPERTIES_HIBERNATE_USE_SQL_COMMENTS: true
       JWT_SECRET: ${JWT_SECRET}
       JWT_EXPIRATION_MS: ${JWT_EXPIRATION_MS}
       SECURITY_ENDPOINTS: ${PUBLIC_ENDPOINTS}
@@ -162,18 +193,19 @@ services:
       SPRING_MAIL_PORT: ${SMTP_MAIL_PORT}
       SPRING_MAIL_USERNAME: ${SMTP_MAIL_USERNAME}
       SPRING_MAIL_PASSWORD: ${SMTP_MAIL_PASSWORD}
-      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: ${SMTP_AUTH}
+      SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH: ${SMTP_MAIL_SMTP_AUTH}
       SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE: ${SMTP_STARTTLS_ENABLE}
-      
     ports:
       - 8082:8080
     networks:
       - corebank-net
     depends_on:
+      - notification-db
       - message_queue
 
 volumes:
   kafka:
+  notification_db:
   auth_db:
     driver: local
 
