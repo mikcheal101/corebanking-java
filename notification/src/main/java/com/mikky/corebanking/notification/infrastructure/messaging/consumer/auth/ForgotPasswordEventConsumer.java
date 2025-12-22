@@ -6,11 +6,15 @@ import org.springframework.stereotype.Component;
 import com.mikky.corebanking.events.domain.event.EventType;
 import com.mikky.corebanking.events.domain.event.auth.ForgotPasswordEvent;
 import com.mikky.corebanking.events.infrastructure.messaging.consumer.DomainEventConsumer;
+import com.mikky.corebanking.notification.infrastructure.messaging.strategy.NotificationStrategyResolver;
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class ForgotPasswordEventConsumer implements DomainEventConsumer<ForgotPasswordEvent> {
 
-    Logger logger = LoggerFactory.getLogger(getClass());
+    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final NotificationStrategyResolver notificationStrategyResolver;
 
     @Override
     public String getTopic() {
@@ -24,6 +28,8 @@ public class ForgotPasswordEventConsumer implements DomainEventConsumer<ForgotPa
 
     @Override
     public void consume(ForgotPasswordEvent event) {
+        event.getPayload().getChannels()
+                .forEach(channel -> this.notificationStrategyResolver.resolveAndSend(event, channel));
         logger.info("Processing event: {}", event);
     }
 }

@@ -6,14 +6,21 @@ import org.springframework.stereotype.Component;
 import com.mikky.corebanking.events.domain.event.EventType;
 import com.mikky.corebanking.events.domain.event.auth.UserCreatedEvent;
 import com.mikky.corebanking.events.infrastructure.messaging.consumer.DomainEventConsumer;
+import com.mikky.corebanking.notification.infrastructure.messaging.strategy.NotificationStrategyResolver;
+import lombok.RequiredArgsConstructor;
 
 @Component
+@RequiredArgsConstructor
 public class UserCreatedEventConsumer implements DomainEventConsumer<UserCreatedEvent> {
 
     private Logger log = LoggerFactory.getLogger(getClass());
+    private final NotificationStrategyResolver notificationStrategyResolver;
 
     @Override
     public void consume(UserCreatedEvent event) {
+        event.getPayload()
+                .getChannels()
+                .forEach(channel -> this.notificationStrategyResolver.resolveAndSend(event, channel));
         log.info("Processing UserCreatedEvent: {}", event);
     }
 

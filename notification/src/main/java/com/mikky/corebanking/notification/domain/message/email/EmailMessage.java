@@ -2,11 +2,13 @@ package com.mikky.corebanking.notification.domain.message.email;
 
 import java.util.List;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Component;
 import com.mikky.corebanking.notification.domain.message.Message;
 import com.mikky.corebanking.notification.domain.message.SendableMessage;
 import lombok.Getter;
 
 @Getter
+@Component
 public abstract class EmailMessage extends Message implements SendableMessage {
 
     private String subject;
