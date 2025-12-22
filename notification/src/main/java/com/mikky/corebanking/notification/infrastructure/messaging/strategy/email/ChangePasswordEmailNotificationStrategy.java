@@ -6,12 +6,12 @@ import org.springframework.stereotype.Component;
 import com.mikky.corebanking.events.domain.event.Event;
 import com.mikky.corebanking.events.domain.event.auth.ForgotPasswordChangeEvent;
 import com.mikky.corebanking.events.domain.event.notification.Channel;
-import com.mikky.corebanking.notification.application.query.service.MessageTemplateQueryService;
 import com.mikky.corebanking.notification.domain.message.MessageType;
 import com.mikky.corebanking.notification.domain.message.email.EmailMessage;
 import com.mikky.corebanking.notification.domain.model.MessageTemplate;
 import com.mikky.corebanking.notification.domain.strategy.NotificationStrategy;
 import com.mikky.corebanking.notification.infrastructure.messaging.email.DefaultEmailMessageFactory;
+import com.mikky.corebanking.notification.infrastructure.persistence.query.MessageTemplateQueryService;
 
 import lombok.RequiredArgsConstructor;
 
