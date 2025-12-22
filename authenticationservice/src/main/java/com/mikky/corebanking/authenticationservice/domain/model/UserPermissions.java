@@ -30,7 +30,7 @@ public class UserPermissions {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     @Builder.Default
     protected Instant createdAt = Instant.now();
 

@@ -27,23 +27,25 @@ public class PasswordResetToken {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     @Builder.Default
     protected Instant createdAt = Instant.now();
 
     @Column(nullable = true)
     protected Instant updatedAt;
 
-    @Column(nullable = true)
+    @Column(nullable = false, updatable = false)
     private String token;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User owner;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
+    @Builder.Default
     private Instant expiry = Instant.now();
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean valid = true;
 }
