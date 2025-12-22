@@ -19,7 +19,6 @@ import com.mikky.corebanking.authenticationservice.infrastructure.persistence.co
 import com.mikky.corebanking.authenticationservice.infrastructure.persistence.command.PasswordResetTokenCommandRepository;
 import com.mikky.corebanking.authenticationservice.infrastructure.persistence.command.RoleCommandRepository;
 import com.mikky.corebanking.authenticationservice.infrastructure.persistence.command.UserCommandRepository;
-import com.mikky.corebanking.authenticationservice.infrastructure.persistence.query.RoleQueryRepository;
 import com.mikky.corebanking.authenticationservice.infrastructure.persistence.query.UserQueryRepository;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -51,9 +50,6 @@ class AuthControllerTest {
 
     @Autowired
     private RoleCommandRepository roleCommandRepository;
-
-    @Autowired
-    private RoleQueryRepository roleQueryRepository;
 
     @Autowired
     private PasswordResetTokenCommandRepository passwordResetTokenCommandRepository;
