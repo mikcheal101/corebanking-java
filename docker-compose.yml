@@ -77,7 +77,7 @@ services:
       POSTGRES_PASSWORD: ${AUTH_PASS}
       POSTGRES_DB: ${AUTH_DB}
     ports:
-      - ${POSTGRESQL_DB_PORT}:5432
+      - ${AUTH_DB_PORT}:5432
     volumes:
       - ./database/auth_db:/var/lib/postgresql/data
     networks:
@@ -98,7 +98,7 @@ services:
       POSTGRES_PASSWORD: ${NOTIFICATION_PASS}
       POSTGRES_DB: ${NOTIFICATION_DB}
     ports:
-      - ${POSTGRESQL_DB_PORT}:5432
+      - ${NOTIFICATION_DB_PORT}:5432
     volumes:
       - ./database/notification_db:/var/lib/postgresql/data
     networks:
