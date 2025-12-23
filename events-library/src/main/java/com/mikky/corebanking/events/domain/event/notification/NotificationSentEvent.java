@@ -2,10 +2,8 @@ package com.mikky.corebanking.events.domain.event.notification;
 
 import java.io.Serializable;
 import java.time.Instant;
-
 import com.mikky.corebanking.events.domain.event.Event;
 import com.mikky.corebanking.events.domain.event.EventType;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -42,5 +40,25 @@ public class NotificationSentEvent implements Event, Serializable {
     @Override
     public EventType getEventType() {
         return this.eventType;
+    }
+
+    @Override
+    public Instant getOccurredAt() {
+        return this.occurredAt;
+    }
+
+    @Override
+    public int getVersion() {
+        return this.version;
+    }
+
+    @Override
+    public String getSource() {
+        return "notification";
+    }
+
+    @Override
+    public Object getPayload() {
+        return this.payload;
     }
 }
