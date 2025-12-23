@@ -28,7 +28,8 @@ public class ForgotPasswordEventConsumer implements DomainEventConsumer<ForgotPa
 
     @Override
     public void consume(ForgotPasswordEvent event) {
-        event.getPayload().getChannels()
+        ((ForgotPasswordEvent.Payload) event.getPayload())
+                .getChannels()
                 .forEach(channel -> this.notificationStrategyResolver.resolveAndSend(event, channel));
         logger.info("Processing event: {}", event);
     }

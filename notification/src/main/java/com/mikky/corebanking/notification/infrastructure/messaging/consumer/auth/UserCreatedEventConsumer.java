@@ -18,7 +18,7 @@ public class UserCreatedEventConsumer implements DomainEventConsumer<UserCreated
 
     @Override
     public void consume(UserCreatedEvent event) {
-        event.getPayload()
+        ((UserCreatedEvent.Payload) event.getPayload())
                 .getChannels()
                 .forEach(channel -> this.notificationStrategyResolver.resolveAndSend(event, channel));
         log.info("Processing UserCreatedEvent: {}", event);

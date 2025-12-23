@@ -5,7 +5,6 @@ import com.mikky.corebanking.events.domain.event.EventType;
 import com.mikky.corebanking.events.domain.event.notification.Channel;
 import com.mikky.corebanking.notification.domain.exceptions.MessageTemplateNotFoundException;
 import com.mikky.corebanking.notification.domain.model.MessageTemplate;
-
 import lombok.RequiredArgsConstructor;
 
 @Service

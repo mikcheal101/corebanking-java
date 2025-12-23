@@ -11,7 +11,6 @@ import org.springframework.kafka.listener.MessageListener;
 import org.springframework.stereotype.Component;
 import com.mikky.corebanking.events.domain.event.Event;
 import com.mikky.corebanking.events.infrastructure.messaging.consumer.DomainEventConsumer;
-
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +25,7 @@ public class KafkaEventConsumer {
 
     @PostConstruct
     public void init() {
-        for(DomainEventConsumer<?> consumer: consumers) {
+        for(DomainEventConsumer<?> consumer: this.consumers) {
             this.startConsumer(consumer);
         }
     }
@@ -37,7 +36,6 @@ public class KafkaEventConsumer {
         containerProperties.setMessageListener((MessageListener<String, T>) messageListener -> {
             try {
                 consumer.consume(messageListener.value());
-
                 log.info("Successfully processed event from topic {}: {}", topic, messageListener.value());
             } catch (Exception e) {
                 log.error(e.getMessage());
