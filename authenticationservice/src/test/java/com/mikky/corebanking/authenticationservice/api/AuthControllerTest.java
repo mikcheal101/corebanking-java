@@ -71,7 +71,7 @@ class AuthControllerTest {
         userCommandRepository.deleteAll();
         roleCommandRepository.deleteAll();
 
-        var customerRole = Role.builder().name("Customer B2C").build();
+        var customerRole = Role.builder().name("CUSTOMER_B2C").build();
         roleCommandRepository.save(customerRole);
     }
 

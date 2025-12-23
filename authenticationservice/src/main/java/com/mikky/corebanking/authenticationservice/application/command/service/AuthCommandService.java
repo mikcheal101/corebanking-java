@@ -68,8 +68,8 @@ public class AuthCommandService {
         var passcode = passwordEncoder.encode(signupRequest.getPassword());
         user.setPassword(passcode);
 
-        var role = roleQueryRepository.findByName("Customer B2C")
-                .orElseThrow(() -> new RoleNotFoundException("Customer B2C"));
+        var role = roleQueryRepository.findByName("CUSTOMER_B2C")
+                .orElseThrow(() -> new RoleNotFoundException("CUSTOMER_B2C"));
         user.setRoles(Set.of(role));
 
         // save user
