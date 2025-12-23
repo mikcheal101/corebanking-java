@@ -1,0 +1,39 @@
+package com.mikky.corebanking.audit.infrastructure.messaging.consumer.auth;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import com.mikky.corebanking.audit.infrastructure.persistence.command.AuditLogCommandService;
+import com.mikky.corebanking.events.domain.event.EventType;
+import com.mikky.corebanking.events.domain.event.auth.UserSignedInEvent;
+import com.mikky.corebanking.events.infrastructure.messaging.consumer.DomainEventConsumer;
+import lombok.RequiredArgsConstructor;
+
+@Component
+@RequiredArgsConstructor
+public class UserSignedInEventConsumer implements DomainEventConsumer<UserSignedInEvent> {
+
+    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final AuditLogCommandService auditLogCommandService;
+
+    @Override
+    public String getTopic() {
+        return EventType.USER_LOGGED_IN.getTopic();
+    }
+
+    @Override
+    public Class<UserSignedInEvent> getEventClass() {
+        return UserSignedInEvent.class;
+    }
+
+    @Override
+    public void consume(UserSignedInEvent event) {
+        try {
+            this.auditLogCommandService.createAuditLog(event);
+            this.logger.info("Consumed {}", this.getTopic());
+        } catch (Exception e) {
+            this.logger.error(e.getMessage());
+        }
+        
+    }
+}
