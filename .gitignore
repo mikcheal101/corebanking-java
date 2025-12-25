@@ -5,3 +5,4 @@ nginx/logs/*
 
 message_queue
 database
+secrets

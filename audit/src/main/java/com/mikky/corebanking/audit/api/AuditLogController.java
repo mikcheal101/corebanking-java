@@ -1,4 +1,4 @@
-package com.mikky.corebanking.audit.interfaces.api;
+package com.mikky.corebanking.audit.api;
 
 import java.util.List;
 import org.springframework.http.HttpStatus;
