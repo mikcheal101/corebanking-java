@@ -3,6 +3,7 @@ package com.mikky.corebanking.authenticationservice.domain.model;
 import java.time.Instant;
 import java.util.UUID;
 import jakarta.persistence.Column;
+import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -12,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,9 +28,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserPermissions {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    @EmbeddedId
+    private UserPermissionId id;
 
     @Column(nullable = false, updatable = false)
     @Builder.Default
@@ -38,18 +39,14 @@ public class UserPermissions {
     protected Instant updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("userId")
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("permissionId")
     @JoinColumn(name = "permission_id", insertable = false, updatable = false)
     private Permission permissions;
-
-    @Column(name = "user_id", nullable = false)
-    private UUID userId;
-
-    @Column(name = "permission_id", nullable = false)
-    private UUID permissionId;
 
     @Builder.Default
     @Enumerated(EnumType.STRING)

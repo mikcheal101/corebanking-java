@@ -1,4 +1,4 @@
-package com.mikky.corebanking.authenticationservice.interfaces.validation;
+package com.mikky.corebanking.authenticationservice.api.validation;
 
 import com.mikky.corebanking.authenticationservice.application.command.dto.ForgotPasswordChangeRequest;
 

@@ -1,4 +1,4 @@
-package com.mikky.corebanking.authenticationservice.interfaces.validation;
+package com.mikky.corebanking.authenticationservice.api.validation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;

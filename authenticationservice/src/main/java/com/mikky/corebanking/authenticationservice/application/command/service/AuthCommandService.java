@@ -18,16 +18,22 @@ import com.mikky.corebanking.authenticationservice.domain.exceptions.RoleNotFoun
 import com.mikky.corebanking.authenticationservice.domain.exceptions.UserDoesNotExistException;
 import com.mikky.corebanking.authenticationservice.domain.exceptions.UsernameAlreadyExistsException;
 import com.mikky.corebanking.authenticationservice.domain.model.PasswordResetToken;
+import com.mikky.corebanking.authenticationservice.domain.model.Permission;
+import com.mikky.corebanking.authenticationservice.domain.model.Role;
 import com.mikky.corebanking.authenticationservice.domain.model.User;
 import com.mikky.corebanking.authenticationservice.infrastructure.messaging.kafka.publisher.ForgotPasswordChangeEventPublisher;
 import com.mikky.corebanking.authenticationservice.infrastructure.messaging.kafka.publisher.ForgotPasswordEventPublisher;
 import com.mikky.corebanking.authenticationservice.infrastructure.messaging.kafka.publisher.UserCreatedEventPublisher;
 import com.mikky.corebanking.authenticationservice.infrastructure.messaging.kafka.publisher.UserSignedInEventPublisher;
 import com.mikky.corebanking.authenticationservice.infrastructure.persistence.command.PasswordResetTokenCommandRepository;
+import com.mikky.corebanking.authenticationservice.infrastructure.persistence.command.PermissionCommandRepository;
+import com.mikky.corebanking.authenticationservice.infrastructure.persistence.command.RoleCommandRepository;
 import com.mikky.corebanking.authenticationservice.infrastructure.persistence.command.UserCommandRepository;
 import com.mikky.corebanking.authenticationservice.infrastructure.persistence.query.PasswordResetTokenQueryRepository;
 import com.mikky.corebanking.authenticationservice.infrastructure.persistence.query.RoleQueryRepository;
 import com.mikky.corebanking.authenticationservice.infrastructure.persistence.query.UserQueryRepository;
+import com.mikky.corebanking.authenticationservice.shared.util.FormattingUtility;
+import com.mikky.corebanking.authenticationservice.shared.util.IJwtUtility;
 import com.mikky.corebanking.events.domain.event.EventType;
 import com.mikky.corebanking.events.domain.event.auth.ForgotPasswordChangeEvent;
 import com.mikky.corebanking.events.domain.event.auth.ForgotPasswordEvent;
@@ -44,6 +50,8 @@ public class AuthCommandService {
     private final UserCommandRepository userCommandRepository;
     private final UserQueryRepository userQueryRepository;
     private final RoleQueryRepository roleQueryRepository;
+    private final RoleCommandRepository roleCommandRepository;
+    private final PermissionCommandRepository permissionCommandRepository;
     private final PasswordEncoder passwordEncoder;
     private final PasswordResetTokenCommandRepository passwordResetTokenCommandRepository;
     private final PasswordResetTokenQueryRepository passwordResetTokenQueryRepository;
@@ -68,8 +76,8 @@ public class AuthCommandService {
         var passcode = passwordEncoder.encode(signupRequest.getPassword());
         user.setPassword(passcode);
 
-        var role = roleQueryRepository.findByName("CUSTOMER_B2C")
-                .orElseThrow(() -> new RoleNotFoundException("CUSTOMER_B2C"));
+        var role = roleQueryRepository.findByName(FormattingUtility.formatRoleName("CUSTOMER_B2C"))
+                .orElseThrow(() -> new RoleNotFoundException(FormattingUtility.formatRoleName("CUSTOMER_B2C")));
         user.setRoles(Set.of(role));
 
         // save user
@@ -81,7 +89,7 @@ public class AuthCommandService {
                 .version(1)
                 .payload(
                         UserCreatedEvent.Payload.builder()
-                                .channels(Set.of(Channel.SMS, Channel.EMAIL))
+                                .channels(Set.of(Channel.EMAIL))
                                 .username(user.getUsername())
                                 .expiry(3200)
                                 .build())
@@ -112,7 +120,7 @@ public class AuthCommandService {
                 .version(1)
                 .payload(
                         UserSignedInEvent.Payload.builder()
-                                .channels(Set.of(Channel.EMAIL, Channel.SMS, Channel.WHATSAPP))
+                                .channels(Set.of(Channel.EMAIL))
                                 .expiry(3200)
                                 .username(user.getUsername())
                                 .build())
@@ -209,6 +217,33 @@ public class AuthCommandService {
             forgotPasswordChangeEventPublisher.publish(event);
         } catch (Exception e) {
             logger.error(e.getMessage());
+        }
+    }
+
+    public boolean createRole(String roleName) {
+        try {
+            var role = Role.builder().name(FormattingUtility.formatRoleName(roleName)).build();
+            this.roleCommandRepository.save(role);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean createPermission(String permissionName, String roleName) throws RoleNotFoundException {
+        try {
+            // get the role
+            var role = this.roleQueryRepository.findByName(FormattingUtility.formatRoleName(roleName))
+                    .orElseThrow(() -> new RoleNotFoundException(FormattingUtility.formatRoleName(roleName)));
+            var permission = Permission.builder().name(FormattingUtility.formatPermissionName(permissionName)).build();
+            this.permissionCommandRepository.save(permission);
+
+            role.getPermissions().add(permission);
+            this.roleCommandRepository.save(role);
+            return true;
+        } catch (Exception e) {
+            this.logger.error(e.getMessage());
+            return false;
         }
     }
 

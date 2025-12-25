@@ -20,6 +20,8 @@ import com.mikky.corebanking.authenticationservice.infrastructure.persistence.co
 import com.mikky.corebanking.authenticationservice.infrastructure.persistence.command.RoleCommandRepository;
 import com.mikky.corebanking.authenticationservice.infrastructure.persistence.command.UserCommandRepository;
 import com.mikky.corebanking.authenticationservice.infrastructure.persistence.query.UserQueryRepository;
+import com.mikky.corebanking.authenticationservice.shared.util.FormattingUtility;
+
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
@@ -71,7 +73,7 @@ class AuthControllerTest {
         userCommandRepository.deleteAll();
         roleCommandRepository.deleteAll();
 
-        var customerRole = Role.builder().name("CUSTOMER_B2C").build();
+        var customerRole = Role.builder().name(FormattingUtility.formatRoleName("CUSTOMER_B2C")).build();
         roleCommandRepository.save(customerRole);
     }
 

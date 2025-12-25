@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import com.mikky.corebanking.authenticationservice.domain.model.Role;
-import com.mikky.corebanking.authenticationservice.infrastructure.persistence.command.RoleCommandRepository;
+import com.mikky.corebanking.authenticationservice.application.command.service.AuthCommandService;
+import com.mikky.corebanking.authenticationservice.application.query.service.AuthQueryService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
@@ -14,25 +14,25 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class DatabaseSeeder implements CommandLineRunner {
 
-    private static final Logger logger = LoggerFactory.getLogger(DatabaseSeeder.class);
-
-    private final RoleCommandRepository roleCommandRepository;
+    private Logger logger = LoggerFactory.getLogger(getClass());
+    private final AuthCommandService authCommandService;
+    private final AuthQueryService authQueryService;
 
     @Override
     public void run(String... args) {
         try {
-            long count = roleCommandRepository.count();
-            logger.info("Checking roles in database: {} existing", count);
 
-            if (count == 0) {
+            if (this.authQueryService.countRoles() == 0) {
                 logger.info("Seeding roles into the database...");
 
-                seedRole("CUSTOMER_B2C");
-                seedRole("CUSTOMER_B2B");
-                seedRole("MERCHANT");
-                seedRole("MERCHANT_ADMINISTRATOR");
-                seedRole("ADMINISTRATOR");
-                seedRole("SUPER_ADMINISTRATOR");
+                this.authCommandService.createRole("CUSTOMER_B2C");
+                this.authCommandService.createRole("CUSTOMER_B2B");
+                this.authCommandService.createRole("MERCHANT");
+                this.authCommandService.createRole("MERCHANT_ADMINISTRATOR");
+                this.authCommandService.createRole("ADMINISTRATOR");
+                this.authCommandService.createRole("SUPER_ADMINISTRATOR");
+
+                this.authCommandService.createPermission("READ_AUDIT_LOG", "ADMINISTRATOR");
 
                 logger.info("Seeding roles completed successfully!");
             } else {
@@ -41,13 +41,5 @@ public class DatabaseSeeder implements CommandLineRunner {
         } catch (Exception e) {
             logger.error("Error occurred while seeding roles", e);
         }
-    }
-
-    private void seedRole(String name) {
-        var role = Role.builder()
-            .name(name)
-            .build();
-        roleCommandRepository.save(role);
-        logger.info("Seeded role: {}", name);
     }
 }

@@ -1,4 +1,4 @@
-package com.mikky.corebanking.authenticationservice.interfaces.api;
+package com.mikky.corebanking.authenticationservice.api.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
