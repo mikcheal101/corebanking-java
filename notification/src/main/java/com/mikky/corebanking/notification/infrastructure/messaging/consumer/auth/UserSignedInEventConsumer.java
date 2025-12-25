@@ -29,9 +29,14 @@ public class UserSignedInEventConsumer implements DomainEventConsumer<UserSigned
     @Override
     public void consume(UserSignedInEvent event) {
         // iterated over the payload channels and send the messages
-        ((UserSignedInEvent.Payload) event.getPayload())
+        try {
+            ((UserSignedInEvent.Payload) event.getPayload())
                 .getChannels()
                 .forEach(channel -> this.notificationStrategyResolver.resolveAndSend(event, channel));
-        log.info("Processing event: {}", event);
+            log.info("Processing event: {}", event);    
+        } catch (Exception e) {
+            this.log.error("UserSignedInEvent error: " + e.getMessage());
+        }
+        
     }
 }
